@@ -1,7 +1,8 @@
 # Circuit Forge - Exploring the World of Electronics and IoT
-Welcome to Circuit Forge—a space where curiosity meets innovation! My name is Udit Maurya, and since late 2020, I’ve been diving deep into the fascinating world of electronics and the Internet of Things (IoT). This GitHub repository showcases some of the exciting projects I've built as part of my journey to understand and push the limits of technology.
+Welcome to Circuit Forge, a hub where curiosity meets innovation! My name is Udit Maurya, and since 2020, I have been working on a variety of electronics and IoT projects. This repository showcases my passion projects, which explore the potential of modern technology in solving real-world challenges.
 
-From an early age, I've had an insatiable curiosity about how things work, especially in electronics. This passion led me to create Circuit Forge as both a personal exploration and a platform to share my projects with like-minded enthusiasts. You’ll find a wide variety of projects here, ranging from home automation to solar performance monitoring, and even RFID-based security systems.
+# About Me
+Since childhood, I have been deeply curious about electronics. Circuit Forge is where I channel that curiosity into projects like home automation, autonomous systems, RFID security, and more. Every project here represents a learning experience and a step forward in my journey to understand the world of IoT and embedded systems.
 
 Featured Projects
 # 1. Home Automation with IoT
