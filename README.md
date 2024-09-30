@@ -45,3 +45,12 @@ A compact waveform generator using an ESP32 microcontroller to produce sine, squ
 # 13. Raspberry Pi Pico-Based Oscilloscope
 This project turns the Raspberry Pi Pico into a portable oscilloscope by connecting it to a smartphone. It captures and displays electrical signals, providing a cost-effective, portable solution for hobbyists and engineers.
 
+# 14. Air Mouse Using MPU6050
+A wireless air mouse that uses an MPU6050 sensor to track hand movements and translate them into cursor control on a PC via an ESP01 module. Clicks are handled by push buttons integrated into the system.
+
+# 15. LinuxMobile Detect: Real-Time Object Recognition
+This project involves real-time object detection using a rooted Android phone running Kali Linux. With 6GB of RAM, the system processes video streams locally for real-time recognition using a YOLO model, offering a powerful mobile-based solution for machine learning tasks.
+
+# 16. Face Recognition-Based Door Lock
+A face recognition system built on a rooted Android phone running Kali Linux. It uses MTCNN for face detection and InceptionResnetV1 for face encoding, sending HTTP requests to an ESP32 to unlock a solenoid door lock when a recognized face is detected.
+
