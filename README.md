@@ -1,3 +1,7 @@
+![My Projects-01](https://github.com/user-attachments/assets/e5ed2abe-b215-4cec-86e5-ba531ee7fe4b)
+
+
+
 # Circuit Forge - Exploring the World of Electronics and IoT
 Welcome to Circuit Forge, a hub where curiosity meets innovation! My name is Udit Maurya, and since 2020, I have been working on a variety of electronics and IoT projects. This repository showcases my passion projects, which explore the potential of modern technology in solving real-world challenges.
 
