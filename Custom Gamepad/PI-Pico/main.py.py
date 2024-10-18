@@ -7,7 +7,7 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 
 uart = busio.UART(tx=board.GP0, rx=board.GP1, baudrate=115200)
-
+##
 mouse = Mouse(usb_hid.devices)
 keyboard = Keyboard(usb_hid.devices)
 
