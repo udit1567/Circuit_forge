@@ -72,10 +72,12 @@ Connect components as shown:
 ## ⚠️ Notes
 - Maximum input voltage is **3.3V** — use a voltage divider for higher voltages.
 - For best results, keep cables short to reduce noise.
-<img width="379" height="117" alt="image" src="https://github.com/user-attachments/assets/0be28bb6-a591-4ba1-b223-f658ea3d134a" />
+
 
 ---
 
 ## 📂 Project Structure
+<img width="379" height="117" alt="image" src="https://github.com/user-attachments/assets/0be28bb6-a591-4ba1-b223-f658ea3d134a" />
+
 
 
