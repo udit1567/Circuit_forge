@@ -1,24 +1,26 @@
-# Air Mouse using MPU-6050, ESP-01, and Raspberry Pi Pico
 
+# 🖱 Air Mouse using MPU-6050, ESP-01, and Raspberry Pi Pico
 ![My Projects-37](https://github.com/user-attachments/assets/93c01b87-4746-4f3d-a00b-4ed0db61c337)
 
 ## 📌 Overview
-This project demonstrates how to create a **wireless Air Mouse** using two distinct modules:
-1. **Transmitter Module** — Consists of an MPU-6050 motion sensor, an ESP-01 Wi-Fi module, and two push buttons.
-2. **Receiver Module** — Consists of an ESP-01 Wi-Fi module connected to a Raspberry Pi Pico acting as a USB HID mouse.
+This project creates a **wireless Air Mouse** that controls a computer's mouse pointer by moving a handheld unit.  
+It uses:
+- **Transmitter Module** → MPU-6050 motion sensor + ESP-01 + two buttons.
+- **Receiver Module** → ESP-01 + Raspberry Pi Pico (acting as a USB HID mouse).
 
-The MPU-6050 detects **gyroscope and accelerometer data** to control cursor movement, while the push buttons handle left and right clicks. The ESP-01 modules communicate wirelessly via the **ESP-NOW protocol**.
+The MPU-6050 detects **accelerometer and gyroscope data** to control cursor movement, while the buttons perform **left** and **right clicks**.  
+Communication between modules is via **ESP-NOW**.
 
 ---
 
 ## 🛠 Components Required
-- **ESP-01 Wi-Fi Module** × 2 (1 transmitter, 1 receiver)
+- **ESP-01 Wi-Fi Module** × 2 (one for transmitter, one for receiver)
 - **MPU-6050** Gyroscope + Accelerometer module
-- **Raspberry Pi Pico** (HID mouse emulation)
-- **Push Buttons** × 2 (Mouse left & right clicks)
+- **Raspberry Pi Pico** (for HID emulation)
+- **Push Buttons** × 2 (for left and right clicks)
 - **Jumper Wires** (Male-to-Male / Female-to-Male)
 - **Breadboard** or **Perfboard**
-- **USB Cable** for Pico
+- **USB Cable** (for Pico)
 - **3.3V Power Supply** (for ESP-01 modules)
 
 ---
@@ -34,8 +36,8 @@ The MPU-6050 detects **gyroscope and accelerometer data** to control cursor move
 | SDA          | GPIO 2    |
 
 **Push Buttons:**
-- Left Click → GPIO 0 with pull-up
-- Right Click → GPIO 2 with pull-up
+- Left Click → GPIO 0 (pull-up enabled)
+- Right Click → GPIO 2 (pull-up enabled)
 
 ---
 
@@ -52,54 +54,63 @@ The MPU-6050 detects **gyroscope and accelerometer data** to control cursor move
 ## 💻 Software Setup
 
 ### **1. Program the Transmitter (ESP-01)**
-- Install **Arduino IDE**.
-- Add **ESP8266 board support** via Board Manager.
+- Open **Arduino IDE**.
+- Install **ESP8266 Board Package**.
 - Install required libraries:
   - `ESP8266WiFi`
   - `espnow`
-  - `Wire` (for MPU-6050)
-- Code tasks:
-  1. Initialize MPU-6050 and calibrate it.
-  2. Read accelerometer & gyroscope data.
-  3. Detect button clicks.
-  4. Send all data via **ESP-NOW** to receiver ESP-01.
+  - `Wire` (for I2C)
+  - `MPU6050` or similar
+- Code should:
+  1. Initialize the MPU-6050.
+  2. Read gyro & accel data.
+  3. Read button states.
+  4. Send the data via **ESP-NOW** to the receiver ESP-01.
 
 ---
 
 ### **2. Program the Receiver (ESP-01)**
-- Use Arduino IDE again.
-- The receiver ESP-01:
-  1. Listens for data from transmitter via ESP-NOW.
-  2. Sends the received data over UART to the Raspberry Pi Pico.
+- Also programmed using Arduino IDE.
+- Code should:
+  1. Receive ESP-NOW packets from the transmitter.
+  2. Forward the data over UART to the Pico.
 
 ---
 
 ### **3. Program the Raspberry Pi Pico**
-- Flash **MicroPython** or **CircuitPython** firmware.
-- Install `adafruit_hid` library.
-- Code tasks:
-  1. Read data from UART.
-  2. Map MPU-6050 data to mouse movement.
-  3. Trigger left/right click events from button data.
+- Flash **MicroPython** or **CircuitPython**.
+- Install the `adafruit_hid` library.
+- Code should:
+  1. Read UART data from the receiver ESP-01.
+  2. Convert the data into HID mouse movements and clicks.
+  3. Send HID events to the connected PC.
 
 ---
 
-## 🚀 Testing
-1. Connect Pico to PC via USB.
-2. Move the transmitter — the mouse pointer should move accordingly.
-3. Press buttons — left/right clicks should be registered.
+## 🚀 How to Run
+1. Power on both transmitter and receiver.
+2. Connect the Pico to the PC via USB.
+3. Move the transmitter — the cursor should follow.
+4. Press buttons for left/right clicks.
 
 ---
 
 ## 🔧 Optional Improvements
-- Apply smoothing algorithms (Kalman/Complementary filters) to stabilize cursor movement.
-- Add a LiPo battery for portability.
-- Design a 3D-printed case.
+- Use a **Kalman filter** to smooth motion data.
+- Add a **LiPo battery** for portability.
+- Make a **3D-printed enclosure**.
 
 ---
 
-## ⚠️ Note on Receiver Choice
-Using a **Raspberry Pi Pico** as the HID receiver works but **is not the most cost-effective** method.  
-You can replace it with an **Arduino Pro Micro** or **Arduino Nano with HID capability**, which can directly act as a USB HID device **at nearly half the cost** of a Pico, reducing hardware complexity.
+## ⚠️ Cost Optimization Note
+Using a **Raspberry Pi Pico** as the receiver HID adds **extra hardware cost**.  
+You can instead use an **Arduino Pro Micro** (or an Arduino Nano with HID capability), which can directly act as a USB HID device at **about half the cost** of a Pico, simplifying the design.
 
 ---
+
+## 📂 Project Structure
+📦 Air-Mouse-Project
+┣ 📂 Pi-Pico # Raspberry Pi Pico HID mouse code
+┣ 📂 receiver # ESP-01 receiver code (ESP-NOW → UART)
+┣ 📂 transmitter # ESP-01 transmitter code (MPU-6050 + buttons)
+┗ 📜 README.md # Project documentation
