@@ -109,8 +109,5 @@ You can instead use an **Arduino Pro Micro** (or an Arduino Nano with HID capabi
 ---
 
 ## 📂 Project Structure
-📦 Air-Mouse-Project
-┣ 📂 Pi-Pico # Raspberry Pi Pico HID mouse code
-┣ 📂 receiver # ESP-01 receiver code (ESP-NOW → UART)
-┣ 📂 transmitter # ESP-01 transmitter code (MPU-6050 + buttons)
-┗ 📜 README.md # Project documentation
+
+<img width="487" height="144" alt="image" src="https://github.com/user-attachments/assets/c6360326-b411-4267-8be3-3ceffbd1f327" />
