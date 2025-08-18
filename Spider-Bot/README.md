@@ -24,13 +24,13 @@ The idea is inspired by an open-source quadruped design, but extended further by
 ## ⚡ Circuit Diagram  
 Below is the connection diagram showing how the Arduino Nano, ESP32-CAM, and servo motors are connected:  
 
-![Circuit Diagram](./985cbabb-1edc-441e-afcd-8e19972e870b.png)  
+![a](https://github.com/user-attachments/assets/1cd4a6c5-4839-4ef3-b440-75298313a785)
 
 - **Arduino Nano** controls 12 servo motors.  
 - **ESP32-CAM** handles live video streaming and sends commands to Arduino.  
 - Both boards share a **common power supply**.
 - 
-![a](https://github.com/user-attachments/assets/1cd4a6c5-4839-4ef3-b440-75298313a785)
+
 
 ---
 
@@ -62,7 +62,8 @@ Below is the connection diagram showing how the Arduino Nano, ESP32-CAM, and ser
 ---
 
 ## 📸 Demo / Preview  
-*(Add images or GIFs of your working bot here)*  
+![IMG000](https://github.com/user-attachments/assets/c6a7d8a1-bb3c-424e-b021-fa1d5abe038f)
+
 
 ---
 
@@ -77,4 +78,5 @@ I have **leveled it up** by integrating an **ESP32-CAM for live video streaming 
 ![Screenshot 2025-01-06 131307](https://github.com/user-attachments/assets/db954234-540c-45f9-aa33-be22acfb9510)
 ![Screenshot 2025-01-06 160735](https://github.com/user-attachments/assets/619a896b-4e78-4afb-bea5-d79f8ffa2c68)
 ![Screenshot 2025-01-06 160753](https://github.com/user-attachments/assets/eba56e55-8d2c-40dc-9cbd-0abf6f76d71a)
+
 
