@@ -33,22 +33,21 @@ The system works as follows:
 
 ---
 
-## 📂 Project Structure  
-Custom Gamepad/
-│
-├── Arduino Nano/
-│ └── Arduino.ino # Arduino Nano code (sensor + button handling)
-│
-├── ESP01-Transmitter/
-│ └── esp01-tx.ino # ESP-01 transmitter code
-│
-├── ESP01-Receiver/
-│ └── esp01-rx.ino # ESP-01 receiver code
-│
-├── Pi-Pico/
-│ └── main.py # Raspberry Pi Pico USB-HID receiver code
-│
-└── README.md # Project documentation
+Custom Gamepad:
+  Arduino Nano:
+    - Arduino.ino: "Arduino Nano code (sensor + button handling)"
+  
+  ESP01-Transmitter:
+    - esp01-tx.ino: "ESP-01 transmitter code"
+  
+  ESP01-Receiver:
+    - esp01-rx.ino: "ESP-01 receiver code"
+  
+  Pi-Pico:
+    - main.py: "Raspberry Pi Pico USB-HID receiver code"
+  
+  README.md: "Project documentation"
+
 
 ---
 
