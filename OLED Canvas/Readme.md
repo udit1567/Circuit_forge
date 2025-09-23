@@ -4,7 +4,8 @@ A feature-rich web interface hosted on an ESP32 for controlling a 128x64 SSD1306
 
 The web app is sent from the ESP32's program memory and communicates with the device via WebSockets, allowing for instant updates on the physical screen.
 
-[Image of the ESP32 OLED Studio web interface]
+![20250922_105355](https://github.com/user-attachments/assets/74fafea8-6de7-4556-a279-8f8614b72753)
+
 
 ---
 
@@ -33,6 +34,9 @@ The web app is sent from the ESP32's program memory and communicates with the de
 #### Wiring
 
 Connect the OLED display to your ESP32's default I2C pins.
+
+![IMG_2961](https://github.com/user-attachments/assets/547c0fe3-ed43-4fab-b922-d0d6bd494300)
+
 
 | OLED Pin | ESP32 Pin |
 | :------- | :-------- |
@@ -83,7 +87,3 @@ Connect your ESP32 to your computer, select the correct board and port in the Ar
     * If **Auto-send** is enabled, the OLED will update with every change. Otherwise, click **Send to OLED** to update the screen.
 
 ---
-
-### ## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
