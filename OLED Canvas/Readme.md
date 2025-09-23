@@ -1,4 +1,4 @@
-# ESP32 OLED Studio 🎨
+# ESP32 OLED Studio
 
 A feature-rich web interface hosted on an ESP32 for controlling a 128x64 SSD1306 OLED display in real-time. Upload images, draw, add text, and apply advanced dithering algorithms directly from your browser.
 
