@@ -7,7 +7,8 @@ By moving the ESP32 device in the air, the cursor on your computer moves accordi
 
 ## 📷 Circuit Diagram
 
-![IMG_2948](https://github.com/user-attachments/assets/895c72e7-2ced-45e2-80c6-81f2809b8d54)
+![IMG_2962 (2)](https://github.com/user-attachments/assets/85f1796a-e780-4030-9029-ef5a011791b4)
+
 
 
 ---
