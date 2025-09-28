@@ -17,8 +17,8 @@
 #define OLED_RESET -1
 
 // Set these:
-const char* ssid     = "Excitel_ 2.4";
-const char* password = "@Udit1588";
+const char* ssid     = "app";
+const char* password = "#Udit1588";
 
 // I2C pins (default SDA=21, SCL=22 on most ESP32 boards)
 #ifndef OLED_ADDR
@@ -52,7 +52,7 @@ const char index_html[] PROGMEM = R"HTML(
   .panel { background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 1px 2px rgba(16,24,40,0.03); }
   .panel h3 { margin:0; padding:12px 14px; font-size:14px; border-bottom:1px solid var(--border); color:var(--muted); background:#fafcff; }
   .canvas-wrap { display:flex; align-items:center; justify-content:center; padding:16px; }
-  #canvas { width:512px; height:256px; image-rendering: pixelated; background:#000; border-radius:10px; border:1px solid var(--border); }
+  #canvas { width:1024px; height:512px; image-rendering: pixelated; background:#000; border-radius:10px; border:1px solid var(--border); }
   .right { display:flex; flex-direction:column; gap:16px; }
   .row { display:flex; gap:8px; flex-wrap:wrap; }
   .ctrl { padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
@@ -493,9 +493,13 @@ void setup() {
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(0,0);
-  display.println("ESP32 OLED Studio");
+
+  // Centered "OLED Canvas"
+  display.setCursor(31, 28);
+  display.println("OLED Canvas");
+
   display.display();
+
 
   // WiFi
   WiFi.mode(WIFI_STA);
