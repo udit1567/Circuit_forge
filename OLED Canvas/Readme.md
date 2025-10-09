@@ -88,4 +88,7 @@ Connect your ESP32 to your computer, select the correct board and port in the Ar
     * Adjust dithering settings and see the results in the live preview.
     * If **Auto-send** is enabled, the OLED will update with every change. Otherwise, click **Send to OLED** to update the screen.
 
----
+🪪 License
+
+© 2025 Circuit Forge — For educational and personal use only.
+Commercial use requires prior permission or licensing from Circuit Forge.
