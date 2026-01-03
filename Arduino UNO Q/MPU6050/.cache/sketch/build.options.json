@@ -1,0 +1,9 @@
+{
+  "additionalFiles": "",
+  "compiler.optimization_flags": "",
+  "customBuildProperties": "",
+  "fqbn": "arduino:zephyr:unoq",
+  "hardwareFolders": "/home/arduino/.arduino15/packages/arduino/hardware/zephyr/0.52.0,/home/arduino/.arduino15/packages/arduino/hardware/zephyr/0.52.0",
+  "otherLibrariesFolders": "/home/arduino/Arduino/libraries",
+  "sketchLocation": "/home/arduino/ArduinoApps/mpu-6050/sketch"
+}

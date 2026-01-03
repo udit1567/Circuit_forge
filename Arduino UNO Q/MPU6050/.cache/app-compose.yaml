@@ -1,0 +1,65 @@
+name: mpu-6050
+include:
+- /home/arduino/.local/share/arduino-app-cli/assets/0.6.2/compose/arduino/motion_detection/brick_compose.yaml
+services:
+  main:
+    image: ghcr.io/arduino/app-bricks/python-apps-base:0.6.2
+    depends_on:
+      ei-motion-detection-runner:
+        condition: service_healthy
+    volumes:
+    - type: bind
+      source: /home/arduino/ArduinoApps/mpu-6050
+      target: /app
+    - type: bind
+      source: /var/run/arduino-router.sock
+      target: /var/run/arduino-router.sock
+    - type: bind
+      source: /sys/class/leds/blue:user
+      target: /sys/class/leds/blue:user
+    - type: bind
+      source: /sys/class/leds/green:user
+      target: /sys/class/leds/green:user
+    - type: bind
+      source: /sys/class/leds/red:user
+      target: /sys/class/leds/red:user
+    - type: bind
+      source: /sys/class/leds/blue:bt
+      target: /sys/class/leds/blue:bt
+    - type: bind
+      source: /sys/class/leds/green:wlan
+      target: /sys/class/leds/green:wlan
+    - type: bind
+      source: /sys/class/leds/red:panic
+      target: /sys/class/leds/red:panic
+    devices:
+    - /dev/video0
+    - /dev/video1
+    - /dev/dri
+    ports:
+    - 7000:7000
+    user: 1000:1000
+    group_add:
+    - dialout
+    - video
+    - audio
+    - render
+    - gpiod
+    entrypoint: /run.sh
+    extra_hosts:
+    - msgpack-rpc-router:host-gateway
+    labels:
+      cc.arduino.app: "true"
+      cc.arduino.app.main: "true"
+      cc.arduino.app.path: /home/arduino/ArduinoApps/mpu-6050
+    environment:
+      APP_HOME: /home/arduino/ArduinoApps/mpu-6050
+      BIND_ADDRESS: 127.0.0.1
+      CUSTOM_MODEL_PATH: /home/arduino/.arduino-bricks/ei-models
+      EI_MOTION_DETECTION_MODEL: /models/ootb/ei/updown-wave-motion-detection.eim
+      HOST_IP: 192.168.1.42
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m

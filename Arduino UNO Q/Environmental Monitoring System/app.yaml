@@ -1,0 +1,6 @@
+name: Weather station
+description: ""
+ports: []
+bricks:
+- arduino:web_ui: {}
+icon: 😀

@@ -1,0 +1,225 @@
+/*
+SPDX-FileCopyrightText: Copyright (C) ARDUINO SRL (http://www.arduino.cc)
+
+SPDX-License-Identifier: MPL-2.0
+*/
+
+@import url('fonts/fonts.css');
+
+/*
+ * This CSS is used to center the various elements on the screen
+ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #DAE3E3;
+    line-height: 1.6;
+    color: #343a40;
+}
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 12px 0;
+}
+
+.arduino-text {
+    color: #008184;
+    font-family: "Roboto Mono", monospace;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    font-style: normal;
+    line-height: 170%;
+    letter-spacing: 2.4px;
+}
+
+.arduino-logo {
+    height: 24px;
+    width: auto;
+}
+
+.main-content {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+}
+
+/*
+ * Styles for specific components required by Anomaly Detection
+ */
+
+.legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 4px;
+    border-radius: 1px;
+}
+
+.controls-section-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    background: #ECF1F1;
+    padding: 16px;
+    border-radius: 8px;
+    min-height: 100%;
+}
+
+.box-title {
+    color: #2C353A;
+    font-family: "Roboto Mono";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 170%;
+    letter-spacing: 1.2px;
+    margin-bottom: 16px;
+}
+
+.controls-section-left {
+    background: #ECF1F1;
+    padding: 16px;
+    border-radius: 8px;
+    min-width: 750px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+  margin-bottom: 12px;
+}
+
+.movement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.label {
+  font-weight: 600;
+  color: #2C353A;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label .emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.value {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.value.primary {
+  color: #16A588;
+}
+
+.value.secondary {
+  color: #5D6A6B;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.primary {
+  background: linear-gradient(90deg, #16A588);
+}
+
+.progress-fill.secondary {
+  background: linear-gradient(90deg, #5D6A6B);
+}
+
+.error-message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/*
+ * Responsive design
+ */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .arduino-text {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .controls-section-left {
+        min-width: 330px;
+    }
+
+    .arduino-logo {
+        height: 16px;
+        width: auto;
+    }
+
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+    .controls-section-left {
+        min-width: 490px;
+    }
+}
+
+@media (max-width: 480px) {
+    .controls-section-left {
+        min-width: 170px;
+    }
+}

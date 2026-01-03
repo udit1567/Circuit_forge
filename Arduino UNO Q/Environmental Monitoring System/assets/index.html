@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Environmental Monitoring System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1 class="arduino-text">Environmental Monitoring System</h1>
+  </div>
+
+  <!-- TOP: 2 x 3 GRID -->
+  <div class="cards-grid" id="classes">
+    <!-- Cards injected dynamically -->
+  </div>
+
+  <!-- BOTTOM: GRAPH -->
+  <div class="graph-section">
+    <div class="box-title">Gas Levels (PPM)</div>
+    <canvas id="plot" width="1200" height="320"></canvas>
+
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-color" style="background:#0068C9"></span> CO₂
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background:#FF9900"></span> CO
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background:#FF2B2B"></span> LPG
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="libs/socket.io.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

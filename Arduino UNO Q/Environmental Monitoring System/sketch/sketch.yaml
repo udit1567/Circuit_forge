@@ -1,0 +1,17 @@
+profiles:
+  default:
+    fqbn: 
+    platforms:
+      - platform: arduino:zephyr
+    libraries:
+      - MsgPack (0.4.2)
+      - DebugLog (0.8.4)
+      - ArxContainer (0.7.0)
+      - ArxTypeTraits (0.3.1)
+      - Adafruit BMP280 Library (2.6.8)
+      - dependency: Adafruit BusIO (1.17.4)
+      - dependency: Adafruit Unified Sensor (1.1.15)
+      - MQGasKit (1.0.0)
+      - MQ135-XCR (1.0.0)
+
+default_profile: default

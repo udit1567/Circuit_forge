@@ -1,0 +1,51 @@
+<!--
+SPDX-FileCopyrightText: Copyright (C) ARDUINO SRL (http://www.arduino.cc)
+
+SPDX-License-Identifier: MPL-2.0
+-->
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-time Accelerometer</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+  </head>
+  <body>
+    <div class="container">
+        <div class="header">
+            <h1 class="arduino-text">Real-time Accelerometer</h1>
+            <img class="arduino-logo" src="img/RGB-Arduino-Logo_Color Inline Loop.svg" alt="Arduino Logo">
+        </div>
+        <div class="main-content">
+            <div class="controls-section-left">
+                <div class="box-title">Accelerometer Data (m/s2)</div>
+                <canvas id="plot" width="640" height="200"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #0068C9;"></div>
+                        <span>X</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FF9900;"></div>
+                        <span>Y</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FF2B2B;"></div>
+                        <span>Z</span>
+                    </div>
+                </div>            </div>
+            <div class="controls-section-right">
+                <div class="box-title">Detected movement (% Confidence)</div>
+                <div id="classes"></div>
+            </div>
+        </div>
+        <div id="error-container" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script src="libs/socket.io.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

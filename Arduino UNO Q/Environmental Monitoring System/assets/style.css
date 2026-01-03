@@ -1,0 +1,118 @@
+@import url('fonts/fonts.css');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #DAE3E3;
+    color: #343a40;
+}
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* HEADER */
+.header {
+    margin-bottom: 20px;
+}
+
+.arduino-text {
+    color: #008184;
+    font-family: "Roboto Mono", monospace;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+/* CARDS GRID */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-bottom: 28px;
+}
+
+.data-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.data-card .label {
+    font-family: "Roboto Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    color: #6C757D;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.data-card .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2C353A;
+}
+
+.data-card .unit {
+    font-size: 12px;
+    color: #6C757D;
+    margin-left: 4px;
+}
+
+/* GRAPH */
+.graph-section {
+    background: #ECF1F1;
+    border-radius: 10px;
+    padding: 18px 20px 16px;
+}
+
+.box-title {
+    font-family: "Roboto Mono", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    margin-bottom: 12px;
+    color: #2C353A;
+}
+
+/* LEGEND */
+.legend {
+    display: flex;
+    gap: 18px;
+    margin-top: 14px;
+    font-size: 13px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-color {
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
