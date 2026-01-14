@@ -1,0 +1,22 @@
+{
+  "name": "Arduino_RouterBridge",
+  "keywords": "rpclite,msgpack",
+  "description": "A RPC bridge for Arduino UNO Q boards",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bcmi-labs/Arduino_RouterBridge"
+  },
+  "authors": {
+    "name": "BCMI-labs",
+    "url": "https://github.com/bcmi-labs/Arduino_RouterBridge",
+    "maintainer": true
+  },
+  "version": "0.2.2",
+  "license": "MPL2.0",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "dependencies":
+  {
+    "name": "bcmi-labs/Arduino_RPClite"
+  }
+}

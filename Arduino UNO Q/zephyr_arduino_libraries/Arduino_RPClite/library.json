@@ -1,0 +1,22 @@
+{
+  "name": "Arduino_RPClite",
+  "keywords": "rpclib,msgpack,serial",
+  "description": "A MessagePack RPC library for Arduino",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bcmi-labs/Arduino_RPClite"
+  },
+  "authors": {
+    "name": "Lucio Rossi",
+    "url": "https://github.com/eigen-value",
+    "maintainer": true
+  },
+  "version": "0.2.0",
+  "license": "MPL2.0",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "dependencies":
+  {
+    "hideakitai/MsgPack": ">=0.4.2"
+  }
+}
