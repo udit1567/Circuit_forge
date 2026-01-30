@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Vehicle Entry–Exit (ANPR)</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1 class="arduino-text">
+        Smart Vehicle Entry–Exit Management System using ANPR and Edge AI
+    </h1>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- LEFT CARD : VIDEO -->
+    <div class="container video-card">
+
+        <div class="video-section">
+            <iframe src="/video_feed" frameborder="0"></iframe>
+        </div>
+
+        <div class="video-actions">
+            <button id="rescanButton">📸 Scan Vehicle</button>
+        </div>
+
+    </div>
+
+    <!-- RIGHT CARD : RECENT DETECTIONS -->
+    <div class="container container-right">
+        <h2 class="recent-scans-title">Recent Detections</h2>
+        <ul id="recentDetections">
+            <!-- JS will populate -->
+        </ul>
+    </div>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

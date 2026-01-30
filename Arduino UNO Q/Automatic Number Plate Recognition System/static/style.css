@@ -1,0 +1,195 @@
+/* ===============================
+   BASE
+================================ */
+
+body {
+    margin: 0;
+    padding: 24px;
+    background: #DAE3E3;
+    font-family: "Open Sans", system-ui, sans-serif;
+    color: #2C353A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ===============================
+   HEADER
+================================ */
+
+.header {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.arduino-text {
+    color: #008184;
+    font-family: "Roboto Mono", monospace;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    margin: 0;
+}
+
+/* ===============================
+   LAYOUT
+================================ */
+
+.main-content {
+    display: flex;
+    gap: 32px;
+    width: 100%;
+    max-width: 1280px;
+    align-items: stretch;
+}
+
+.container {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===============================
+   VIDEO CARD
+================================ */
+
+.video-card {
+    flex: 1;
+    gap: 16px;
+}
+
+/* Video frame */
+/* Video container */
+/* VIDEO CONTAINER */
+.video-section {
+    width: 100%;
+    height: 420px;              /* ðŸ‘ˆ KEY FIX */
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* VIDEO STREAM */
+.video-section iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Button area */
+.video-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+#rescanButton {
+    background: #008184;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+#rescanButton:hover {
+    background: #006b6d;
+    transform: translateY(-1px);
+}
+
+#rescanButton:active {
+    transform: translateY(0);
+}
+
+/* ===============================
+   RIGHT PANEL
+================================ */
+
+.container-right {
+    width: 420px;
+}
+
+.recent-scans-title {
+    font-family: "Roboto Mono", monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    margin-bottom: 12px;
+}
+
+/* ===============================
+   RECENT DETECTIONS LIST
+================================ */
+
+#recentDetections {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+}
+
+#recentDetections li {
+    border-top: 1px solid #C9D2D2;
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+}
+
+#recentDetections li:first-child {
+    border-top: none;
+}
+
+.detection-plate {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.detection-status {
+    font-size: 12px;
+    color: #008184;
+    font-weight: 600;
+}
+
+.detection-time {
+    font-size: 12px;
+    color: #5D6A6B;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1024px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .container-right {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+
+    .arduino-text {
+        font-size: 18px;
+    }
+
+    #rescanButton {
+        width: 100%;
+    }
+}
