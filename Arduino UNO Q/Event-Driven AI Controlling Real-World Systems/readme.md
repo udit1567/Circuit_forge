@@ -174,14 +174,7 @@ All without changing the core architecture.
 - Impact-focused
 - Ready for real-world deployment
 
----
 
-## License
-
-SPDX-License-Identifier: MPL-2.0  
-Copyright © Arduino SRL
-
----
 
 ## Acknowledgements
 
