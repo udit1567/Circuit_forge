@@ -7,6 +7,8 @@ This project detects **persons** from a live video stream, displays detections
 in a browser-based UI, and sends instant **Telegram alerts** when an intrusion
 is detected.
 
+<img width="1280" height="960" alt="image" src="https://github.com/user-attachments/assets/6b1f9dd3-3c6a-4fa9-8eb8-b0e32b345bd7" />
+
 ## FEATURES
 
 - Real-time person detection using Edge AI
