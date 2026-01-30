@@ -1,5 +1,3 @@
-![My Projects-01](https://github.com/user-attachments/assets/e5ed2abe-b215-4cec-86e5-ba531ee7fe4b)
-
 ## 👋 Hi, I’m Udit Maurya
 
 I’m a **Machine Learning & AI engineer** with a strong foundation in **embedded systems and electronics**, focused on building intelligent models that run efficiently on **edge and low-power devices**. My work sits at the intersection of **Machine Learning, Computer Vision, and real-world hardware deployment**.
