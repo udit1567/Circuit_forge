@@ -168,24 +168,6 @@ Technologies:
 
 
 
-## PROJECT STRUCTURE
-
-project/
-│
-├── arduino/
-│   └── gas_monitor.ino
-│
-├── app.py
-├── app.js
-├── index.html
-├── style.css
-├── libs/
-│   └── socket.io.min.js
-│
-└── README.md
-
-
-
 
 ## DATA TIMING
 
