@@ -8,6 +8,9 @@ using a deep learning model, extracts plate text using OCR, and automatically
 logs vehicle entry and exit events in a database with a web-based dashboard.
 
 
+<img width="513" height="736" alt="Screenshot 2026-01-30 at 7 30 03 PM" src="https://github.com/user-attachments/assets/4ce95473-91d6-41de-bfd2-f204f48a9c11" />
+
+
 ## FEATURES
 
 - Live camera video streaming (MJPEG)
