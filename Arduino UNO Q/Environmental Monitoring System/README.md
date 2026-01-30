@@ -3,11 +3,14 @@
 End-to-end environmental and gas monitoring system using Arduino, Linux Bridge runtime,
 and a real-time Web UI.
 
+<img width="1294" height="726" alt="Screenshot 2026-01-03 at 10 36 57 PM" src="https://github.com/user-attachments/assets/04207790-983a-40b4-9760-66b04b8b8485" />
+
+
 This system reads multiple gas and environmental sensors on Arduino, transfers the data
 to a Linux environment using Arduino_RouterBridge, and visualizes the data live using
 WebSockets in a browser-based dashboard.
 
-================================================================================
+
 
 ## FEATURES
 
@@ -24,7 +27,7 @@ WebSockets in a browser-based dashboard.
 - WebSocket-based real-time UI
 - Fully local edge deployment (no cloud)
 
-================================================================================
+
 
 ## SYSTEM ARCHITECTURE
 
@@ -54,7 +57,7 @@ WebSockets in a browser-based dashboard.
   - Live metric cards
   - Real-time PPM graph
 
-================================================================================
+
 
 ## HARDWARE REQUIREMENTS
 
@@ -65,7 +68,7 @@ WebSockets in a browser-based dashboard.
 - Jumper wires
 - Stable power supply
 
-================================================================================
+
 
 ## SOFTWARE REQUIREMENTS
 
@@ -83,7 +86,7 @@ WebSockets in a browser-based dashboard.
 - Arduino App Runtime
 - Web UI Brick
 
-================================================================================
+
 
 ## ARDUINO FIRMWARE OVERVIEW
 
@@ -109,7 +112,7 @@ Sensors transmitted:
 - mq2_co
 - mq2_smoke
 
-================================================================================
+
 
 ## PYTHON BACKEND OVERVIEW
 
@@ -135,7 +138,6 @@ REST Endpoints:
 - get_samples()
 - get_gas()
 
-================================================================================
 
 ## WEB UI OVERVIEW
 
@@ -164,7 +166,7 @@ Technologies:
 - Socket.IO
 - Canvas API
 
-================================================================================
+
 
 ## PROJECT STRUCTURE
 
@@ -182,22 +184,8 @@ project/
 │
 └── README.md
 
-================================================================================
 
-## RUNNING THE PROJECT
 
-1) Flash Arduino Firmware
-   - Open gas_monitor.ino
-   - Select board and port
-   - Upload
-
-2) Start Python Backend
-   python3 app.py
-
-3) Open Web UI
-   http://<device-ip>:<port>
-
-================================================================================
 
 ## DATA TIMING
 
@@ -205,7 +193,7 @@ project/
 - UI update: real-time
 - Graph history length: 200 samples
 
-================================================================================
+
 
 ## NOTES
 
@@ -214,13 +202,7 @@ project/
 - Designed for edge devices with low CPU usage
 - Works fully offline
 
-================================================================================
 
-## LICENSE
-
-SPDX-License-Identifier: MPL-2.0
-
-================================================================================
 
 ## AUTHOR
 
