@@ -3,9 +3,13 @@
 End-to-end real-time intrusion detection system using an on-device camera,
 Edge AI object detection, Web UI visualization, and Telegram alerts.
 
+<img width="1436" height="817" alt="Screenshot 2026-01-30 at 7 35 16 PM" src="https://github.com/user-attachments/assets/20509d7d-2ed8-428f-a51b-ed8e784c6387" />
+
 This project detects **persons** from a live video stream, displays detections
 in a browser-based UI, and sends instant **Telegram alerts** when an intrusion
 is detected.
+
+
 
 <img width="1280" height="960" alt="image" src="https://github.com/user-attachments/assets/6b1f9dd3-3c6a-4fa9-8eb8-b0e32b345bd7" />
 
