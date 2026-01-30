@@ -1,0 +1,20 @@
+profiles:
+  default:
+    fqbn: 
+    platforms:
+      - platform: arduino:zephyr
+    libraries:
+      - MsgPack (0.4.2)
+      - DebugLog (0.8.4)
+      - ArxContainer (0.7.0)
+      - ArxTypeTraits (0.3.1)
+      - dependency: ArduinoGraphics (1.1.4)
+      - dependency: Arduino_HS300x (1.0.0)
+      - dependency: Arduino_LPS22HB (1.0.2)
+      - dependency: Arduino_LSM6DSOX (1.1.2)
+      - dependency: Arduino_LTR381RGB (1.0.0)
+      - Arduino_Modulino (0.7.0)
+      - dependency: STM32duino VL53L4CD (1.0.5)
+      - dependency: STM32duino VL53L4ED (1.0.1)
+
+default_profile: default
