@@ -7,21 +7,19 @@ import urllib.request
 import urllib.parse
 import json
 import os
-# ================= TELEGRAM CONFIG =================
+
+
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 if not BOT_TOKEN or not CHAT_ID:
     raise RuntimeError("Telegram BOT_TOKEN or CHAT_ID not set")
 
-# ==================================================
 
 ui = WebUI()
 detection_stream = VideoObjectDetection(confidence=0.5, debounce_sec=2.0)
 
-# --------------------------------------------------
-# SAFE TELEGRAM TEXT SENDER (stdlib only)
-# --------------------------------------------------
+# SAFE TELEGRAM TEXT SENDER
 def send_text_to_telegram(message):
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -38,17 +36,15 @@ def send_text_to_telegram(message):
     except Exception as e:
         print("[TELEGRAM ERROR]", repr(e))
 
-# --------------------------------------------------
+
 # UI threshold override
-# --------------------------------------------------
 ui.on_message(
     "override_th",
     lambda sid, threshold: detection_stream.override_threshold(threshold)
 )
 
-# --------------------------------------------------
+
 # Person detected callback
-# --------------------------------------------------
 def person_detected(detection):
     confidence = detection.get("confidence", 0.0)
 
@@ -76,9 +72,8 @@ def person_detected(detection):
 
     print("[INFO] Intrusion detected (text alert sent)")
 
-# --------------------------------------------------
+
 # All detections → UI
-# --------------------------------------------------
 def send_detections_to_ui(detections: dict):
     for label, details in detections.items():
         ui.send_message("detection", message={
@@ -87,13 +82,11 @@ def send_detections_to_ui(detections: dict):
             "timestamp": datetime.now(UTC).isoformat()
         })
 
-# --------------------------------------------------
+
 # Register callbacks
-# --------------------------------------------------
 detection_stream.on_detect("person", person_detected)
 detection_stream.on_detect_all(send_detections_to_ui)
 
-# --------------------------------------------------
+
 # Run app
-# --------------------------------------------------
 App.run()
