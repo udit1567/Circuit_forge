@@ -13,21 +13,6 @@ Designed for real-world AI deployments and demonstrations such as the **AI Impac
 - Event-driven communication instead of polling
 - Safe, explainable, and scalable AI-to-physical-world interaction
 
----
-
-## Core Idea
-
-> **AI observes.  
-> Embedded systems decide.  
-> Hardware acts.**
-
-The system follows a strict architectural rule:
-
-- **Python / AI** reports *what it sees*
-- **MCU (Arduino)** decides *what to do*
-- **MCU alone controls hardware**
-
-This mirrors best practices in safety-critical and embedded AI systems.
 
 ---
 
