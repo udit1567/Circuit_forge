@@ -156,9 +156,3 @@ Time: <UTC timestamp>
 - Restricted area surveillance
 - Edge AI security systems
 
-
-## LIMITATIONS
-
-- Telegram alerts require internet
-- Accuracy depends on model and lighting
-- Single-camera setup (extendable)
