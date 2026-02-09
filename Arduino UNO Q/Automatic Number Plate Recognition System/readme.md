@@ -195,14 +195,6 @@ Example Response:
 - If plate exists and status = IN → EXIT
 - Duplicate entries prevented using UNIQUE plate constraint
 
-
-## PERFORMANCE NOTES
-
-- Real-time inference depends on hardware
-- GPU significantly improves OCR performance
-- Suitable for edge devices and local servers
-
-
 ## LIMITATIONS
 
 - OCR accuracy depends on lighting and plate quality
