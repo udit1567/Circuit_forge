@@ -4,12 +4,28 @@
  #include <WiFi.h>
  #include <HTTPClient.h>
  #include <ArduinoJson.h>
+#include <TinyGPSPlus.h>
+#include <HardwareSerial.h>
  
  // ── User config ──────────────────────────────────────────────
  #define WIFI_SSID             "Infinity"
  #define WIFI_PASSWORD         "#Udit1588"
- #define RADAR_LAT              25.3176f   // Varanasi
- #define RADAR_LON              83.0128f
+// GPS overrides radar centre at runtime once fix acquired
+ #define RADAR_LAT_DEFAULT      25.3176f   // Varanasi fallback
+ #define RADAR_LON_DEFAULT      83.0128f
+ #define GPS_RX_PIN  20
+ #define GPS_TX_PIN  21
+ #define GPS_BAUD    9600
+
+TinyGPSPlus  gps;
+HardwareSerial gpsSerial(1);
+
+// Live radar centre — updated from GPS when fix valid
+static float radarLat = RADAR_LAT_DEFAULT;
+static float radarLon = RADAR_LON_DEFAULT;
+static bool  gpsFixed     = false;
+static int   gpsSats      = 0;
+static bool  gpsFirstFix    = false;   // Issue 3: first-fix flag
  #define OPENSKY_CLIENT_ID     "ckt.forge@gmail.com-api-client"
  #define OPENSKY_CLIENT_SECRET "HRy7EAnbZ9G8rc0kqgGWqFOzv0RcOSdM"
  
@@ -92,7 +108,7 @@
  // ── Radar geometry ───────────────────────────────────────────
  #define RCX    120
  #define RCY    120
- #define ROUTER 110
+ #define ROUTER 100   // Issue 2: reduced from 110 — status bar at y=212 clears ring bottom at y=220
  
  // ── Aircraft store ───────────────────────────────────────────
  struct RadarAC {
@@ -117,7 +133,162 @@
  static int  prevSelIdx = -1;  // previously drawn selection (for erase)
  static bool detailOpen = false;
  
- // ── OAuth2 ───────────────────────────────────────────────────
+ // -- Boot mode -------------------------------------------------
+#define BOOT_MODE_RADAR  0
+#define BOOT_MODE_GPS    1
+static int  bootMode = BOOT_MODE_RADAR;
+
+static void drawModeSelect(int sel) {
+  tft.fillScreen(COL_BG);
+  tft.setTextColor(COL_WHITE, COL_BG); tft.setTextSize(1);
+  tft.setCursor(75, 70); tft.print("SELECT MODE");
+  tft.drawFastHLine(50, 82, 140, COL_RING_MID);
+
+  if (sel == 0) tft.fillRoundRect(52, 94, 136, 22, 5, C(0,40,0));
+  tft.setTextColor(sel == 0 ? COL_SEL : COL_DIM, sel == 0 ? C(0,40,0) : COL_BG);
+  if (sel == 0) tft.drawRoundRect(52, 94, 136, 22, 5, COL_RING_OUT);
+  tft.setCursor(70, 100); tft.print("Flight Radar");
+
+  if (sel == 1) tft.fillRoundRect(52, 122, 136, 22, 5, C(0,40,0));
+  tft.setTextColor(sel == 1 ? COL_SEL : COL_DIM, sel == 1 ? C(0,40,0) : COL_BG);
+  if (sel == 1) tft.drawRoundRect(52, 122, 136, 22, 5, COL_RING_OUT);
+  tft.setCursor(76, 128); tft.print("GPS Status");
+
+  tft.setTextColor(C(60,60,60), COL_BG);
+  tft.setCursor(54, 158); tft.print("Turn=scroll  SW=select");
+  tft.setCursor(68, 170); tft.print("Auto: Radar in 8s");
+}
+
+static void runGpsStatusScreen() {
+  while (true) {
+    // Feed GPS
+    while (gpsSerial.available()) gps.encode(gpsSerial.read());
+
+    bool fix = gps.location.isValid() &&
+               gps.location.age() < 3000 &&
+               gps.hdop.isValid() && gps.hdop.hdop() < 5.0f &&
+               gps.satellites.isValid() && gps.satellites.value() >= 4;
+
+    // ── Full screen redraw (1 s refresh, no flicker on round display) ──
+    tft.fillScreen(COL_BG);
+
+    // Outer ring decoration
+    tft.drawCircle(120, 120, 118, COL_RING_IN);
+
+    // ── Header bar ───────────────────────────────────────────────────
+    tft.fillRect(30, 18, 180, 18, C(0,30,0));
+    tft.drawRoundRect(30, 18, 180, 18, 4, COL_RING_OUT);
+    tft.setTextColor(COL_WHITE, C(0,30,0)); tft.setTextSize(1);
+    tft.setCursor(70, 23); tft.print("GPS STATUS");
+
+    // ── Fix badge ────────────────────────────────────────────────────
+    uint16_t fixCol = fix ? C(0,200,0) : C(200,0,0);
+    tft.fillRoundRect(155, 19, 50, 15, 3, fixCol);
+    tft.setTextColor(COL_BG, fixCol);
+    tft.setCursor(159, 23); tft.print(fix ? "FIX OK" : "NO FIX");
+
+    // ── Satellite count (large) ──────────────────────────────────────
+    tft.setTextSize(3);
+    tft.setTextColor(GC9A01A_YELLOW, COL_BG);
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%d", (int)gps.satellites.value());
+    tft.setCursor(100, 42); tft.print(buf);
+    tft.setTextSize(1);
+    tft.setTextColor(COL_DIM, COL_BG);
+    tft.setCursor(100, 70); tft.print("satellites");
+
+    // Divider
+    tft.drawFastHLine(20, 80, 200, COL_RING_MID);
+
+    // ── Data rows ────────────────────────────────────────────────────
+    struct GpsRow { const char* label; char val[28]; uint16_t col; };
+    GpsRow rows[8];
+
+    // LAT
+    rows[0].label = "LAT";
+    rows[0].col   = COL_CYAN;
+    if (gps.location.isValid())
+      snprintf(rows[0].val, 28, "%.6f N", gps.location.lat());
+    else strcpy(rows[0].val, "---");
+
+    // LON
+    rows[1].label = "LON";
+    rows[1].col   = COL_CYAN;
+    if (gps.location.isValid())
+      snprintf(rows[1].val, 28, "%.6f E", gps.location.lng());
+    else strcpy(rows[1].val, "---");
+
+    // ALTITUDE
+    rows[2].label = "ALT";
+    rows[2].col   = C(255,200,0);
+    if (gps.altitude.isValid())
+      snprintf(rows[2].val, 28, "%.1fm / %.0fft",
+               gps.altitude.meters(), gps.altitude.feet());
+    else strcpy(rows[2].val, "---");
+
+    // SPEED
+    rows[3].label = "SPEED";
+    rows[3].col   = C(0,220,120);
+    if (gps.speed.isValid())
+      snprintf(rows[3].val, 28, "%.1f km/h  %.0f kts",
+               gps.speed.kmph(), gps.speed.knots());
+    else strcpy(rows[3].val, "---");
+
+    // HEADING
+    rows[4].label = "HDG";
+    rows[4].col   = COL_WHITE;
+    if (gps.course.isValid())
+      snprintf(rows[4].val, 28, "%.1f deg", gps.course.deg());
+    else strcpy(rows[4].val, "---");
+
+    // HDOP
+    rows[5].label = "HDOP";
+    rows[5].col   = (gps.hdop.isValid() && gps.hdop.hdop() < 2.0f) ? C(0,220,0) :
+                    (gps.hdop.isValid() && gps.hdop.hdop() < 5.0f) ? GC9A01A_YELLOW : C(220,0,0);
+    if (gps.hdop.isValid())
+      snprintf(rows[5].val, 28, "%.2f", gps.hdop.hdop());
+    else strcpy(rows[5].val, "---");
+
+    // TIME IST (UTC+5:30)
+    rows[6].label = "TIME IST";
+    rows[6].col   = C(255,160,0);
+    if (gps.time.isValid()) {
+      int hr = gps.time.hour() + 5;
+      int mn = gps.time.minute() + 30;
+      if (mn >= 60) { mn -= 60; hr++; }
+      if (hr >= 24)  hr -= 24;
+      snprintf(rows[6].val, 28, "%02d:%02d:%02d", hr, mn, gps.time.second());
+    } else strcpy(rows[6].val, "---");
+
+    // DATE
+    rows[7].label = "DATE";
+    rows[7].col   = C(255,160,0);
+    if (gps.date.isValid())
+      snprintf(rows[7].val, 28, "%04d-%02d-%02d",
+               gps.date.year(), gps.date.month(), gps.date.day());
+    else strcpy(rows[7].val, "---");
+
+    // Render rows
+    tft.setTextSize(1);
+    for (int i = 0; i < 8; i++) {
+      int y = 86 + i * 17;
+      tft.setTextColor(COL_RING_OUT, COL_BG);
+      tft.setCursor(22, y); tft.print(rows[i].label); tft.print(":");
+      tft.setTextColor(rows[i].col, COL_BG);
+      tft.setCursor(80, y); tft.print(rows[i].val);
+    }
+
+    // Footer
+    tft.drawFastHLine(20, 224, 200, COL_RING_MID);
+    tft.setTextColor(C(50,50,50), COL_BG);
+    tft.setCursor(30, 227);
+    tft.printf("chars:%lu", gps.charsProcessed());
+
+    delay(1000);
+  }
+}
+
+// ── OAuth2 ───────────────────────────────────────────────────
  static char          oauthToken[2048] = "";
  static unsigned long tokenExpireMs    = 0;
  
@@ -127,10 +298,24 @@
  
  // ── Coordinate helpers ───────────────────────────────────────
  static void latLonToXY(float lat, float lon, int &x, int &y) {
-   float nx = (lon - RADAR_LON + RADAR_RAD) / (2.0f * RADAR_RAD);
-   float ny = (lat - RADAR_LAT + RADAR_RAD) / (2.0f * RADAR_RAD);
-   x = (int)(nx * 240.0f);
-   y = (int)(240.0f - ny * 240.0f);
+   // Map lat/lon to normalised offsets from radar centre (-1..+1)
+   float fx = (lon - radarLon) / RADAR_RAD;   // +1 = east edge, -1 = west edge
+   float fy = (lat - radarLat) / RADAR_RAD;   // +1 = north edge, -1 = south edge
+
+   // Scale to radar pixel radius, inset by 8 px so triangle/circle fits inside ring
+   const float maxR = ROUTER - 8.0f;
+   float px = fx * maxR;
+   float py = -fy * maxR;   // screen Y increases downward
+
+   // Clamp to radar circle — push any out-of-range blip onto the ring edge
+   float dist = sqrtf(px * px + py * py);
+   if (dist > maxR && dist > 0.0f) {
+     px = px / dist * maxR;
+     py = py / dist * maxR;
+   }
+
+   x = RCX + (int)px;
+   y = RCY + (int)py;
  }
  
  // ── Background elements ──────────────────────────────────────
@@ -229,105 +414,117 @@
    }
  }
  
- // ── Detail panel ─────────────────────────────────────────────
- static void drawDetailPanel() {
-   if (radarCount == 0) return;
-   RadarAC &a = radarAC[selIdx];
- 
-   // Panel background
-   tft.fillRoundRect(18, 52, 204, 150, 10, COL_PANEL_BG);
-   tft.drawRoundRect(18, 52, 204, 150, 10, COL_PANEL_BDR);
-   tft.drawRoundRect(19, 53, 202, 148, 10, C(80, 80, 0));  // soft inner glow
- 
-   // ── Callsign header ──────────────────────────────────────
-   tft.setTextSize(2);
-   tft.setTextColor(COL_SEL, COL_PANEL_BG);
-   tft.setCursor(30, 62);
-   tft.print(a.callsign[0] ? a.callsign : "------");
- 
-   // ICAO24 on same header line, right side
-   tft.setTextSize(1);
-   tft.setTextColor(COL_DIM, COL_PANEL_BG);
-   tft.setCursor(145, 68);
-   tft.print(a.icao[0] ? a.icao : "------");
- 
-   // Divider
-   tft.drawFastHLine(28, 82, 184, C(0, 80, 0));
- 
-   // ── Data rows ────────────────────────────────────────────
-   struct { const char* label; char val[24]; uint16_t col; } rows[6];
- 
-   // Country
-   rows[0].label = "Country";
-   strncpy(rows[0].val, a.country[0] ? a.country : "--", 24);
-   rows[0].col = COL_WHITE;
- 
-   // Altitude
+// ── Detail panel — full screen, matches reference screenshot ──
+static void drawDetailPanel() {
+  if (radarCount == 0) return;
+  RadarAC &a = radarAC[selIdx];
 
-   rows[1].label = "Altitude";
-   if (a.alt_m >= 0) snprintf(rows[1].val, 24, "%d ft", (int)(a.alt_m * 3.28084f));
-   else strcpy(rows[1].val, "--");
-   rows[1].col = COL_CYAN;
- 
-   // Speed
+  // Full screen wipe — clean slate like reference
+  tft.fillScreen(COL_BG);
 
-   rows[2].label = "Speed";
-   if (a.vel_ms >= 0) snprintf(rows[2].val, 24, "%d kts", (int)(a.vel_ms * 1.94384f));
-   else strcpy(rows[2].val, "--");
-   rows[2].col = COL_CYAN;
- 
-   // Heading
+  // Outer green circle border (matches reference)
+  tft.drawCircle(120, 120, 118, COL_RING_OUT);
+  tft.drawCircle(120, 120, 117, C(0,60,0));
 
-   rows[3].label = "Heading";
-   if (a.heading >= 0) snprintf(rows[3].val, 24, "%d deg", (int)a.heading);
-   else strcpy(rows[3].val, "--");
-   rows[3].col = COL_WHITE;
- 
-   // Latitude
+  // ── Plane icon at top (arrow pointing in heading direction) ──
+  int ix = 120, iy = 38;
+  float hr = a.heading * DEG_TO_RAD;
+  float ddx = sinf(hr), ddy = -cosf(hr);
+  float ppx = -ddy,     ppy =  ddx;
+  // fuselage
+  tft.drawLine(ix + (int)(ddx*12), iy + (int)(ddy*12),
+               ix - (int)(ddx*10), iy - (int)(ddy*10), COL_SWEEP);
+  // wings
+  int wx = ix + (int)(ddx*2), wy = iy + (int)(ddy*2);
+  tft.fillTriangle(wx, wy,
+    wx + (int)(ppx*11 - ddx*4), wy + (int)(ppy*11 - ddy*4),
+    wx - (int)(ppx*11 + ddx*4), wy - (int)(ppy*11 + ddy*4), COL_SWEEP);
+  // tail
+  tft.fillTriangle(ix - (int)(ddx*7), iy - (int)(ddy*7),
+    ix - (int)(ddx*10) + (int)(ppx*5), iy - (int)(ddy*10) + (int)(ppy*5),
+    ix - (int)(ddx*10) - (int)(ppx*5), iy - (int)(ddy*10) - (int)(ppy*5), COL_SWEEP);
 
-   rows[4].label = "Lat";
-   snprintf(rows[4].val, 24, "%.3f", a.lat);
-   rows[4].col = COL_DIM;
- 
-   // Longitude
+  // ── Callsign — large centred ─────────────────────────────
+  const char* cs = a.callsign[0] ? a.callsign : a.icao;
+  tft.setTextSize(3);
+  tft.setTextColor(COL_SWEEP, COL_BG);
+  int csLen = (int)strlen(cs);
+  int csX   = 120 - (csLen * 9);
+  if (csX < 20) csX = 20;
+  tft.setCursor(csX, 60);
+  tft.print(cs);
 
-   rows[5].label = "Lon";
-   snprintf(rows[5].val, 24, "%.3f", a.lon);
-   rows[5].col = COL_DIM;
- 
-   tft.setTextSize(1);
-   for (int r = 0; r < 6; r++) {
-     int y = 88 + r * 16;
-     tft.setTextColor(C(0, 140, 0), COL_PANEL_BG);
-     tft.setCursor(28, y);
-     tft.print(rows[r].label);
-     tft.setTextColor(rows[r].col, COL_PANEL_BG);
-     tft.setCursor(105, y);
-     tft.print(rows[r].val);
-   }
- 
-   // Aircraft counter badge
-   tft.setTextColor(COL_DIM, COL_PANEL_BG);
-   tft.setCursor(28, 190);
-   tft.print(selIdx + 1); tft.print("/"); tft.print(radarCount);
- 
-   // Dismiss hint
-   tft.setTextColor(C(50, 80, 50), COL_PANEL_BG);
-   tft.setCursor(90, 190);
-   tft.print("SW to close");
- }
- 
- static void closeDetailPanel() {
-   // Wipe panel area only — no fillScreen
-   tft.fillRoundRect(18, 52, 204, 150, 10, COL_BG);
-   // Restore rings + cross in that region
-   drawRings(); drawCross();
-   drawAllAC();
-   drawSelRing(selIdx, false);
-   drawAC(radarAC[selIdx].px, radarAC[selIdx].py,
-          radarAC[selIdx].heading, radarAC[selIdx].color, false);
-   drawSelTag(selIdx, false);
- }
+  // Thin divider
+  tft.drawFastHLine(40, 88, 160, C(0,60,0));
+
+  // ── Data rows — green monospace, reference style ─────────
+  tft.setTextSize(1);
+  char buf[32];
+
+  // ALT — label green, value cyan
+  tft.setTextColor(COL_SWEEP, COL_BG);
+  tft.setCursor(44, 100);
+  tft.print("ALT ");
+  tft.setTextColor(GC9A01A_CYAN, COL_BG);
+  if (a.alt_m >= 0) snprintf(buf, 32, "%d m", (int)a.alt_m);
+  else strcpy(buf, "--- m");
+  tft.print(buf);
+
+  // SPD — label green, value yellow
+  tft.setTextColor(COL_SWEEP, COL_BG);
+  tft.setCursor(44, 118);
+  tft.print("SPD ");
+  tft.setTextColor(GC9A01A_YELLOW, COL_BG);
+  if (a.vel_ms >= 0) snprintf(buf, 32, "%d m/s", (int)a.vel_ms);
+  else strcpy(buf, "--- m/s");
+  tft.print(buf);
+
+  // HDG — label green, value orange
+  tft.setTextColor(COL_SWEEP, COL_BG);
+  tft.setCursor(44, 136);
+  tft.print("HDG ");
+  tft.setTextColor(C(255,140,0), COL_BG);
+  snprintf(buf, 32, "%d deg", (int)a.heading);
+  tft.print(buf);
+
+  // COUNTRY — label green, value white
+  tft.setTextColor(COL_SWEEP, COL_BG);
+  tft.setCursor(44, 154);
+  tft.print("COUNTRY ");
+  tft.setTextColor(GC9A01A_WHITE, COL_BG);
+  tft.print(a.country[0] ? a.country : "---");
+
+  // ICAO24 — label green, value magenta
+  tft.setTextColor(COL_SWEEP, COL_BG);
+  tft.setCursor(44, 172);
+  tft.print("ICAO ");
+  tft.setTextColor(GC9A01A_MAGENTA, COL_BG);
+  tft.print(a.icao[0] ? a.icao : "------");
+
+  // Divider
+  tft.drawFastHLine(40, 186, 160, C(0,60,0));
+
+  // ── Bottom hints ─────────────────────────────────────────
+  tft.setTextColor(C(0,140,0), COL_BG);
+  snprintf(buf, 32, "%d/%d", selIdx + 1, radarCount);
+  tft.setCursor(44, 196); tft.print(buf);
+
+  tft.setCursor(64, 214);
+  tft.print("< Rotate >");
+}
+
+static void closeDetailPanel() {
+  // detail card used fillScreen so full redraw needed
+  drawBackground();
+  drawAllAC();
+  if (radarCount > 0 && selIdx < radarCount) {
+    drawSelRing(selIdx, false);
+    drawAC(radarAC[selIdx].px, radarAC[selIdx].py,
+           radarAC[selIdx].heading, radarAC[selIdx].color, false);
+    drawSelTag(selIdx, false);
+  }
+}
+
  
  // ── OAuth2 ───────────────────────────────────────────────────
  static bool fetchToken() {
@@ -367,8 +564,8 @@
    snprintf(url, sizeof(url),
      "https://opensky-network.org/api/states/all"
      "?lamin=%.4f&lomin=%.4f&lamax=%.4f&lomax=%.4f",
-     RADAR_LAT - RADAR_RAD, RADAR_LON - RADAR_RAD,
-     RADAR_LAT + RADAR_RAD, RADAR_LON + RADAR_RAD);
+     radarLat - RADAR_RAD, radarLon - RADAR_RAD,
+     radarLat + RADAR_RAD, radarLon + RADAR_RAD);
    Serial.println(url);  Serial.flush();
  
    HTTPClient http;
@@ -449,7 +646,45 @@ static void drawSweepLine(float angle, uint16_t col) {
   }
 }
  
- // ════════════════════════════════════════════════════════════
+ // ── GPS ──────────────────────────────────────────────────────
+static void readGPS() {
+  // Feed all available GPS bytes into TinyGPSPlus — non-blocking
+  while (gpsSerial.available()) gps.encode(gpsSerial.read());
+
+  bool nowFixed = gps.location.isValid() &&
+                  gps.location.age() < 3000 &&
+                  gps.hdop.isValid() && gps.hdop.hdop() < 5.0f &&
+                  gps.satellites.isValid() && gps.satellites.value() >= 4;
+
+  if (nowFixed) {
+    radarLat = (float)gps.location.lat();
+    radarLon = (float)gps.location.lng();
+    gpsSats  = (int)gps.satellites.value();
+  }
+  bool wasFixed = gpsFixed;
+  gpsFixed = nowFixed;
+
+  // Issue 3: on first valid GPS fix, immediately refetch aircraft with correct centre
+  if (nowFixed && !wasFixed && !gpsFirstFix) {
+    gpsFirstFix = true;
+    Serial.println(F("[GPS] First fix — refetching aircraft with GPS coords"));
+    Serial.flush();
+    fetchAircraft();
+    drawBackground();
+    drawAllAC();
+    if (radarCount > 0) {
+      selIdx = constrain(selIdx, 0, radarCount - 1);
+      drawSelRing(selIdx, false);
+      drawAC(radarAC[selIdx].px, radarAC[selIdx].py,
+             radarAC[selIdx].heading, radarAC[selIdx].color, false);
+      drawSelTag(selIdx, false);
+    }
+    lastFetchMs = millis();
+  }
+}
+
+
+// ════════════════════════════════════════════════════════════
  //  SETUP
  // ════════════════════════════════════════════════════════════
  void setup() {
@@ -457,6 +692,10 @@ static void drawSweepLine(float angle, uint16_t col) {
    { unsigned long t0 = millis(); while (!Serial && millis()-t0 < 5000) delay(10); }
    delay(500);
    Serial.println(F("\n\n=== FLIGHT RADAR BOOT ==="));  Serial.flush();
+
+  // GPS UART
+  gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_RX_PIN, GPS_TX_PIN);
+  Serial.println(F("[GPS] Serial1 started on GPIO20/21"));  Serial.flush();
  
    // Encoder
    pinMode(ENC_CLK, INPUT_PULLUP);
@@ -470,49 +709,72 @@ static void drawSweepLine(float angle, uint16_t col) {
    tft.begin();  tft.setSPISpeed(40000000);  tft.setRotation(2);
    Serial.println(F("[Display] Init OK"));  Serial.flush();
  
-   tft.fillScreen(COL_BG);
-   tft.setTextColor(COL_RING_OUT, COL_BG);  tft.setTextSize(1);
-   tft.setCursor(40, 110);  tft.print("Connecting WiFi...");
- 
-   Serial.printf("[WiFi] Connecting to %s\n", WIFI_SSID);  Serial.flush();
-   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-   for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) { delay(500); Serial.print('.'); }
-   Serial.println();  Serial.flush();
- 
-   if (WiFi.status() != WL_CONNECTED) {
-     tft.fillScreen(COL_BG);  tft.setTextColor(C(255,80,0), COL_BG);
-     tft.setCursor(30, 110);  tft.print("WiFi FAILED");
-     while (1) delay(1000);
-   }
-   Serial.printf("[WiFi] Connected: %s\n", WiFi.localIP().toString().c_str());  Serial.flush();
- 
-   tft.fillScreen(COL_BG);
-   tft.setTextColor(COL_RING_OUT, COL_BG);
-   tft.setCursor(50, 110);  tft.print("Authenticating...");
-   if (!fetchToken()) {
-     tft.fillScreen(COL_BG);  tft.setTextColor(C(255,80,0), COL_BG);
-     tft.setCursor(30, 110);  tft.print("Auth FAILED");
-     while (1) delay(1000);
-   }
- 
-   drawBackground();
-   fetchAircraft();
-   drawBackground();
-   drawAllAC();
- 
-   // Draw initial selection ring
-   if (radarCount > 0) {
-     drawSelRing(selIdx, false);
-     drawAC(radarAC[selIdx].px, radarAC[selIdx].py,
-            radarAC[selIdx].heading, radarAC[selIdx].color, false);
-     drawSelTag(selIdx, false);
-     prevSelIdx = selIdx;
-   }
- 
-   lastFetchMs = millis();
-   lastFrameMs = millis();
-   Serial.println(F("[Boot] Radar running"));  Serial.flush();
- }
+  // -- Boot mode select (encoder scroll, SW confirm, 8 s auto-select radar)
+  drawModeSelect(bootMode);
+  unsigned long modeDeadline = millis() + 8000UL;
+  while (millis() < modeDeadline) {
+    int d = readEncoder();
+    if (d != 0) {
+      bootMode = (bootMode + 1) % 2;
+      drawModeSelect(bootMode);
+      modeDeadline = millis() + 8000UL;
+    }
+    if (readButton()) break;
+    delay(10);
+  }
+  Serial.printf("[Boot] Mode: %d\n", bootMode);  Serial.flush();
+
+  // GPS-only mode
+  if (bootMode == BOOT_MODE_GPS) {
+    runGpsStatusScreen();
+    return;
+  }
+
+  // Flight Radar mode
+  tft.fillScreen(COL_BG);
+  tft.setTextColor(COL_RING_OUT, COL_BG);  tft.setTextSize(1);
+  tft.setCursor(40, 110);  tft.print("Connecting WiFi...");
+
+  Serial.printf("[WiFi] Connecting to %s\n", WIFI_SSID);  Serial.flush();
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) { delay(500); Serial.print('.'); }
+  Serial.println();  Serial.flush();
+
+  if (WiFi.status() != WL_CONNECTED) {
+    tft.fillScreen(COL_BG);  tft.setTextColor(C(255,80,0), COL_BG);
+    tft.setCursor(30, 110);  tft.print("WiFi FAILED");
+    while (1) delay(1000);
+  }
+  Serial.printf("[WiFi] Connected: %s\n", WiFi.localIP().toString().c_str());  Serial.flush();
+
+  tft.fillScreen(COL_BG);
+  tft.setTextColor(COL_RING_OUT, COL_BG);
+  tft.setCursor(50, 110);  tft.print("Authenticating...");
+  if (!fetchToken()) {
+    tft.fillScreen(COL_BG);  tft.setTextColor(C(255,80,0), COL_BG);
+    tft.setCursor(30, 110);  tft.print("Auth FAILED");
+    while (1) delay(1000);
+  }
+
+  drawBackground();
+  fetchAircraft();
+  drawBackground();
+  drawAllAC();
+
+  // Draw initial selection ring (no red GPS text on boot)
+  if (radarCount > 0) {
+    drawSelRing(selIdx, false);
+    drawAC(radarAC[selIdx].px, radarAC[selIdx].py,
+           radarAC[selIdx].heading, radarAC[selIdx].color, false);
+    drawSelTag(selIdx, false);
+    prevSelIdx = selIdx;
+  }
+
+  lastFetchMs = millis();
+  lastFrameMs = millis();
+  Serial.println(F("[Boot] Radar running"));  Serial.flush();
+}
+
  
  // ════════════════════════════════════════════════════════════
  //  LOOP
@@ -520,7 +782,9 @@ static void drawSweepLine(float angle, uint16_t col) {
  void loop() {
    unsigned long now = millis();
  
-   // ── Read encoder ─────────────────────────────────────────
+   // ── GPS feed (non-blocking) ─────────────────────────────
+  readGPS();
+  // ── Read encoder ─────────────────────────────────────────
    int delta = readEncoder();
    if (delta != 0 && radarCount > 0 && !detailOpen) {
      int oldSel = selIdx;
